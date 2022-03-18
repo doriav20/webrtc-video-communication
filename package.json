@@ -1,0 +1,22 @@
+{
+  "name": "webrtc-video-communication",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "desktop-screenshot": "^0.1.1",
+    "ejs": "^3.1.6",
+    "express": "^4.17.3",
+    "peer": "^0.6.1",
+    "peerjs": "^1.3.2",
+    "socket.io": "^4.4.1",
+    "uuid": "^8.3.2"
+  }
+}
