@@ -1,11 +1,13 @@
 const express = require("express");
-const app = express();
-const server = require("http").Server(app);
+const http = require("http");
 const { v4: uuidv4 } = require("uuid");
-const io = require("socket.io")(server);
+const { Server } = require("socket.io");
+const { ExpressPeerServer } = require("peer");
 const screenshot = require("desktop-screenshot");
 
-const { ExpressPeerServer } = require("peer");
+const app = express();
+const server = http.Server(app);
+const io = new Server(server);
 const peerServer = ExpressPeerServer(server);
 
 app.set("view engine", "ejs");
@@ -30,7 +32,7 @@ io.on("connection", (socket) => {
         });
 
         socket.on("message", (message, username) => {
-            io.to(roomId).emit("createMessage", username + " :" + message);
+            io.to(roomId).emit("createMessage", username, message);
         });
 
         socket.on("leave", () => {
@@ -43,4 +45,7 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(process.env.PORT || 3030);
+const PORT = process.env.PORT || 3030;
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

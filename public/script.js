@@ -93,9 +93,10 @@ navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) 
             video.remove();
         }
     });
-    socket.on("createMessage", (msg) => {
-        let listItem = document.createElement("li");
-        listItem.innerHTML = msg;
+    socket.on("createMessage", (senderUsername, msg) => {
+        const fullMsg = senderUsername + ": " + msg;
+        const listItem = document.createElement("li");
+        listItem.innerHTML = fullMsg;
         allMessages.append(listItem);
         mainChatWindow.scrollTop = mainChatWindow.scrollHeight;
     });
