@@ -1,8 +1,8 @@
-const socket = io("/")
+const socket = io("/");
 const chatInputBox = document.getElementById("chat_message");
 const allMessages = document.getElementById("all_messages");
 const mainChatWindow = document.getElementById("main__chat__window");
-const videoGrid = document.getElementById("video-grid")
+const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
 myVideo.muted = true;
 
@@ -34,7 +34,7 @@ const nameSubmitted = () => {
         document.getElementById("chatTitle").innerHTML = "Chat: " + myUserName;
         document.getElementById("nameInput").remove();
     }
-}
+};
 
 const connectToNewUser = (userId, streams) => {
     const call = peer.call(userId, streams);
@@ -46,7 +46,7 @@ const connectToNewUser = (userId, streams) => {
     });
     if (screenshareEnabled) {
         let screen_track = myScreenshareStream.getVideoTracks()[0];
-        let sender = call.peerConnection.getSenders().find(s => s.track.kind === screen_track.kind);
+        let sender = call.peerConnection.getSenders().find((s) => s.track.kind === screen_track.kind);
         sender.replaceTrack(screen_track);
     }
 };
@@ -66,7 +66,7 @@ const addVideoStream = (videoEl, stream) => {
     }
 };
 
-navigator.mediaDevices.getUserMedia({video: true, audio: true}).then((stream) => {
+navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
     myVideoStream = stream;
     addVideoStream(myVideo, stream);
 
@@ -112,7 +112,7 @@ navigator.mediaDevices.getUserMedia({video: true, audio: true}).then((stream) =>
 });
 
 peer.on("call", (call) => {
-    navigator.mediaDevices.getUserMedia({video: true, audio: true}).then((newUserStream) => {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((newUserStream) => {
         call.answer(newUserStream); // Answer the call with an A/V stream.
         const newUserID = call.peer;
         const newUserVideo = document.createElement("video");
@@ -126,9 +126,9 @@ peer.on("call", (call) => {
 
 const takeScreenshotEvent = () => {
     socket.emit("screenshot");
-}
+};
 const leave = () => {
-    myVideoStream.getTracks().forEach(track => {
+    myVideoStream.getTracks().forEach((track) => {
         track.stop();
     });
     if (screenshareEnabled) {
@@ -137,14 +137,13 @@ const leave = () => {
     socket.emit("leave");
     document.getElementById("main").remove();
     window.stop();
-}
+};
 
 const playPauseVideoEvent = () => {
     let cameraEnabled = myVideoStream.getVideoTracks()[0].enabled;
     if (cameraEnabled) {
         setPlayVideo();
-    }
-    else {
+    } else {
         if (screenshareEnabled) {
             playPauseScreenshareEvent();
         }
@@ -158,16 +157,18 @@ const playPauseVideoEvent = () => {
             lastId = peers[peer]._localStream.id;
         }
     }
-}
+};
 
 const playPauseScreenshareEvent = () => {
     if (screenshareEnabled) {
-        setPlayScreenshare()
+        setPlayScreenshare();
         screenshareEnabled = false;
         myScreenshareStream.getVideoTracks()[0].stop();
         let videoTrack = myVideoStream.getVideoTracks()[0];
-        Object.keys(peers).forEach(userId => {
-            let sender = peers[userId].peerConnection.getSenders().find(sender => sender.track.kind === videoTrack.kind);
+        Object.keys(peers).forEach((userId) => {
+            let sender = peers[userId].peerConnection
+                .getSenders()
+                .find((sender) => sender.track.kind === videoTrack.kind);
             sender.replaceTrack(videoTrack);
         });
         document.getElementById(myUserID + "_screenshare").remove();
@@ -176,10 +177,9 @@ const playPauseScreenshareEvent = () => {
         if (cameraEnabledBeforeScreenshare) {
             playPauseVideoEvent();
         }
-    }
-    else {
+    } else {
         cameraEnabledBeforeScreenshare = myVideoStream.getVideoTracks()[0].enabled;
-        navigator.mediaDevices.getDisplayMedia({cursor: true}).then((stream) => {
+        navigator.mediaDevices.getDisplayMedia({ cursor: true }).then((stream) => {
             setStopScreenshare();
             myScreenshareStream = stream;
             let screenTrack = myScreenshareStream.getVideoTracks()[0];
@@ -187,8 +187,10 @@ const playPauseScreenshareEvent = () => {
             screenTrack.onended = () => {
                 setPlayScreenshare();
                 screenshareEnabled = false;
-                Object.keys(peers).forEach(userId => {
-                    let sender = peers[userId].peerConnection.getSenders().find(sender => sender.track.kind === screenTrack.kind);
+                Object.keys(peers).forEach((userId) => {
+                    let sender = peers[userId].peerConnection
+                        .getSenders()
+                        .find((sender) => sender.track.kind === screenTrack.kind);
                     sender.replaceTrack(myVideoStream.getVideoTracks()[0]);
                 });
                 document.getElementById(myUserID + "_screenshare").remove();
@@ -197,10 +199,12 @@ const playPauseScreenshareEvent = () => {
                 if (cameraEnabledBeforeScreenshare) {
                     playPauseVideoEvent();
                 }
-            }
+            };
 
-            Object.keys(peers).forEach(userId => {
-                let sender = peers[userId].peerConnection.getSenders().find(sender => sender.track.kind === screenTrack.kind);
+            Object.keys(peers).forEach((userId) => {
+                let sender = peers[userId].peerConnection
+                    .getSenders()
+                    .find((sender) => sender.track.kind === screenTrack.kind);
                 sender.replaceTrack(screenTrack);
             });
             let cameraEnabled = myVideoStream.getVideoTracks()[0].enabled;
@@ -215,30 +219,27 @@ const playPauseScreenshareEvent = () => {
             screenshareEnabled = true;
         });
     }
-}
+};
 
 const copyURL = () => {
     const roomUrl = peer._options.host + ":" + peer._options.port + "/" + ROOM_ID;
     if (navigator.clipboard) {
         navigator.clipboard.writeText(roomUrl);
-    }
-    else {
-        document.addEventListener('copy', (e) => {
-            e.clipboardData.setData('text/plain', roomUrl);
-            e.clipboardData.setData('text/html', roomUrl);
+    } else {
+        document.addEventListener("copy", (e) => {
+            e.clipboardData.setData("text/plain", roomUrl);
+            e.clipboardData.setData("text/html", roomUrl);
             e.preventDefault();
         });
-        document.execCommand('copy');
+        document.execCommand("copy");
     }
-}
+};
 
 const muteUnmute = () => {
     const enabled = myVideoStream.getAudioTracks()[0].enabled;
     if (enabled) {
         setUnmuteButton();
-
-    }
-    else {
+    } else {
         setMuteButton();
     }
     myVideoStream.getAudioTracks()[0].enabled = !enabled;
@@ -255,13 +256,13 @@ const setPlayScreenshare = () => {
     const playPauseScreenshareButton = document.getElementById("screenshare");
     const htmlContent = '<i class=" fa fa-tv"></i><span class="">Share Screen</span>';
     playPauseScreenshareButton.innerHTML = htmlContent;
-}
+};
 
 const setStopScreenshare = () => {
     const playPauseScreenshareButton = document.getElementById("screenshare");
     const htmlContent = '<i class="unmute fa fa-tv"></i><span class="unmute">Stop Share Screen</span>';
     playPauseScreenshareButton.innerHTML = htmlContent;
-}
+};
 
 const setPlayVideo = () => {
     const playPauseVideoButton = document.getElementById("playPauseVideo");
